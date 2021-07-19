@@ -1,0 +1,321 @@
+﻿<Window x:Class="GFC_V0.EditeDelete"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GFC_V0"
+        mc:Ignorable="d"
+        Title="EditeDelete" Height="605" Width="1050" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+    <Window.Resources>
+        <Style x:Key="TabItemStyle1" TargetType="{x:Type TabItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Border x:Name="Border" BorderThickness="1,1,1,1" CornerRadius="7,7,0,0"
+                        Padding="5,5,5,5" Margin="0,0,0,0" BorderBrush="Gainsboro">
+                            <ContentPresenter x:Name="ContentSite" ContentSource="Header" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="Black"/>
+                                <Setter TargetName="Border" Property="Background" Value="white"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="White"/>
+                                <Setter TargetName="Border" Property="Background" Value="#01396a" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <local:SumConverter x:Key="MySumConverter"/>
+        <local:TotalConverter x:Key="MyTotalConverter"/>
+        <local:EbitdaConverter x:Key="MyEbitdaConverter"/>
+        <local:EbitConverter x:Key="MyEbitConverter"/>
+        <local:UtilidadAntesImpuestoConverter x:Key="MyUtilidadAntesImpuesto"/>
+        <local:UtilidadNeta x:Key="MyUtilidadNeta"/>
+    </Window.Resources>
+    <Grid>
+        <Canvas Background="WhiteSmoke" HorizontalAlignment="Left" Height="412" Margin="0,0,0,0" VerticalAlignment="Top" Width="1040">
+            <DatePicker Name="dprFecha" HorizontalAlignment="Left" Margin="450,20,0,0" VerticalAlignment="Top"/>
+            <GroupBox Header="Balance General"  Height="408" Canvas.Left="10" Canvas.Top="0" Width="590" FontWeight="Bold" FontSize="14" BorderThickness="2">
+                <Label Content="(Valores expresados en unidades monetarias)" HorizontalAlignment="Left" Margin="105,0,0,0" VerticalAlignment="Top" FontSize="9" FontWeight="Normal" Foreground="Gray"/>
+            </GroupBox>
+            <Label Name="lblPeriodo" Content="Periodo:" HorizontalAlignment="Left" Margin="390,20,0,0" VerticalAlignment="Top" FontSize="12" FontWeight="Normal"/>
+            <Label Name="lblActivo"  Content="Activos" HorizontalAlignment="Left" Margin="20,40,0,0" VerticalAlignment="Top" FontSize="13" FontWeight="Bold"/>
+            <Label Name="lblActivoCirculante"  Content="Activos circulantes" HorizontalAlignment="Left" Margin="20,60,0,0" VerticalAlignment="Top" FontSize="12" FontWeight="Bold"/>
+            <Label Name="lblEfectivo"  Content="Efectivo" HorizontalAlignment="Left" Margin="20,80,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtEfectivo" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="80" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblInvTemp"  Content="Inversiones temporales" HorizontalAlignment="Left" Margin="20,100,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtInversionesTemporales" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="100" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblCxC"  Content="Cuentas p/Cobrar" HorizontalAlignment="Left" Margin="20,120,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtCxC" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="120" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblInventario"  Content="Inventarios" HorizontalAlignment="Left" Margin="20,140,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtInventarios" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="140" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblOtrosActivosCirculante"  Content="Otros activos circulantes" HorizontalAlignment="Left" Margin="20,160,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtOtrosActivosCirculantes" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="160" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblTotalActivosCirculante"  Content="Total activos circulantes" HorizontalAlignment="Left" Margin="20,180,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtTotalActivosCirculantes"  HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="180" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MySumConverter}"
+                                    StringFormat="{}{0:N}"
+                                    FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text" ElementName="txtEfectivo" />
+                        <Binding Path="Text" ElementName="txtInversionesTemporales" />
+                        <Binding Path="Text" ElementName="txtCxC" />
+                        <Binding Path="Text" ElementName="txtInventarios" />
+                        <Binding Path="Text" ElementName="txtOtrosActivosCirculantes" />
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Label Name="lblActivoFijo"  Content="Activos fijos" HorizontalAlignment="Left" Margin="20,200,0,0" VerticalAlignment="Top" FontSize="12" FontWeight="Bold"/>
+            <Label Name="lblEquiposYMaquinarias"  Content="Equipos y maquinarias" HorizontalAlignment="Left" Margin="20,220,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtEquiposYMaquinarias" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="220" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblInmuebles"  Content="Bienes inmuebles" HorizontalAlignment="Left" Margin="20,240,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtBienesInmuebles" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="240" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblTerrenos"  Content="Terrenos" HorizontalAlignment="Left" Margin="20,260,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtTerrenos" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="260" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblActivosIntangibles"  Content="Activos intangibles" HorizontalAlignment="Left" Margin="20,280,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtActivosIntangibles" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="280" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblDepreciacionAcumulada"  Content="Depreciación acumulada" HorizontalAlignment="Left" Margin="20,300,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtDepreciacionAcumulada" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="300" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblOtrosActivosLargoPlazo"  Content="Otros activos a largo plazo" HorizontalAlignment="Left" Margin="20,320,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtOtrosActivosLargoPlazo" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="320" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblTotalActivosFijos"  Content="Total activos fijos" HorizontalAlignment="Left" Margin="20,340,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtTotalActivosFijos" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="340" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MySumConverter}"
+                                    StringFormat="{}{0:N}"
+                                    FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text" ElementName="txtEquiposYMaquinarias" />
+                        <Binding Path="Text" ElementName="txtBienesInmuebles" />
+                        <Binding Path="Text" ElementName="txtTerrenos" />
+                        <Binding Path="Text" ElementName="txtActivosIntangibles" />
+                        <Binding Path="Text" ElementName="txtDepreciacionAcumulada" />
+                        <Binding Path="Text" ElementName="txtOtrosActivosLargoPlazo" />
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Label Name="lblTotalActivos"  Content="Total activos" HorizontalAlignment="Left" Margin="20,380,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtTotalActivos"  HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="18" Canvas.Left="160" TextWrapping="Wrap" Canvas.Top="380" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MySumConverter}"
+                                    StringFormat="{}{0:N}"
+                                    FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text" ElementName="txtEfectivo" />
+                        <Binding Path="Text" ElementName="txtInversionesTemporales" />
+                        <Binding Path="Text" ElementName="txtCxC" />
+                        <Binding Path="Text" ElementName="txtInventarios" />
+                        <Binding Path="Text" ElementName="txtOtrosActivosCirculantes" />
+                        <Binding Path="Text" ElementName="txtEquiposYMaquinarias" />
+                        <Binding Path="Text" ElementName="txtBienesInmuebles" />
+                        <Binding Path="Text" ElementName="txtTerrenos" />
+                        <Binding Path="Text" ElementName="txtActivosIntangibles" />
+                        <Binding Path="Text" ElementName="txtDepreciacionAcumulada" />
+                        <Binding Path="Text" ElementName="txtOtrosActivosLargoPlazo" />
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Label Name="lblPasivos"  Content="Pasivos" HorizontalAlignment="Left" Margin="320,40,0,0" VerticalAlignment="Top" FontSize="13" FontWeight="Bold"/>
+            <Label Name="lblPasivoCirculante"  Content="Pasivos circulantes" HorizontalAlignment="Left" Margin="320,60,0,0" VerticalAlignment="Top" FontSize="12" FontWeight="Bold"/>
+            <Label Name="lblCxP"  Content="Cuentas p/Pagar" HorizontalAlignment="Left" Margin="320,80,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtCxP" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="80" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblEfectosxPagar"  Content="Efectos p/Pagar" HorizontalAlignment="Left" Margin="320,100,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtEfectosxPagar" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="100" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblObligacionesLaborales"  Content="Obligaciones laborales" HorizontalAlignment="Left" Margin="320,120,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtObligacionesLaborales" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="120" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblObligacionesFiscales"  Content="Obligaciones fiscales" HorizontalAlignment="Left" Margin="320,140,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtObligacionesFiscales" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="140" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblPrevisionesYContingencia"  Content="Provisiones y contingencia" HorizontalAlignment="Left" Margin="320,160,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtPrevisionesYContingencia" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="160" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblOtrosPasivosCirculantes"  Content="Otros pasivos circulantes" HorizontalAlignment="Left" Margin="320,180,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtOtrosPasivosCirculantes" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="180" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblTotalPasivosCirculantes"  Content="Total pasivos circulantes" HorizontalAlignment="Left" Margin="320,200,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtTotalPasivosCirculantes"  HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="200" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MySumConverter}"
+                                    StringFormat="{}{0:N}"
+                                    FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text" ElementName="txtCxP" />
+                        <Binding Path="Text" ElementName="txtEfectosxPagar" />
+                        <Binding Path="Text" ElementName="txtObligacionesLaborales" />
+                        <Binding Path="Text" ElementName="txtObligacionesFiscales" />
+                        <Binding Path="Text" ElementName="txtPrevisionesYContingencia" />
+                        <Binding Path="Text" ElementName="txtOtrosPasivosCirculantes" />
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Label Name="lblPasivosLargoPlazo"  Content="Pasivos a largo plazo" HorizontalAlignment="Left" Margin="320,220,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <Label Name="lblBonos"  Content="Bonos" HorizontalAlignment="Left" Margin="320,240,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtBonos" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="240" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblOtrosPasivosLargoPlazo"  Content="Otros pasivos a largo plazo" HorizontalAlignment="Left" Margin="320,260,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtOtrosPasivosLargoPlazo" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="260" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblTotalPasivosLargoPlazo"  Content="Total pasivos a largo plazo" HorizontalAlignment="Left" Margin="320,280,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtTotalPasivosLargoPlazo" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="280" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MySumConverter}"
+                                    StringFormat="{}{0:N}"
+                                    FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text" ElementName="txtBonos" />
+                        <Binding Path="Text" ElementName="txtOtrosPasivosLargoPlazo" />
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Label Name="lblPatrimonio"  Content="Patrimonio" HorizontalAlignment="Left" Margin="320,300,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <Label Name="lblCapital"  Content="Capital" HorizontalAlignment="Left" Margin="320,320,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtCapital" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="320" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblUtilidadRetenida"  Content="Utilidades retenidas" HorizontalAlignment="Left" Margin="320,340,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtUtilidadRetenida" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="340" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblTotalPatrimonio"  Content="Total patrimonio" HorizontalAlignment="Left" Margin="320,360,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtTotalPatrimonio" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="360" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MySumConverter}"
+                                    StringFormat="{}{0:N}"
+                                    FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text" ElementName="txtCapital" />
+                        <Binding Path="Text" ElementName="txtUtilidadRetenida" />
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Label Name="lblTotaPasivoYlPatrimonio"  Content="Total pasivo y patrimonio" HorizontalAlignment="Left" Margin="320,380,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtTotalPasivoYPatrimonio" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="465" TextWrapping="Wrap" Canvas.Top="380" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MySumConverter}"
+                                    StringFormat="{}{0:N}"
+                                    FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text" ElementName="txtCxP" />
+                        <Binding Path="Text" ElementName="txtEfectosxPagar" />
+                        <Binding Path="Text" ElementName="txtObligacionesLaborales" />
+                        <Binding Path="Text" ElementName="txtObligacionesFiscales" />
+                        <Binding Path="Text" ElementName="txtPrevisionesYContingencia" />
+                        <Binding Path="Text" ElementName="txtOtrosPasivosCirculantes" />
+                        <Binding Path="Text" ElementName="txtBonos" />
+                        <Binding Path="Text" ElementName="txtOtrosPasivosLargoPlazo" />
+                        <Binding Path="Text" ElementName="txtCapital" />
+                        <Binding Path="Text" ElementName="txtUtilidadRetenida" />
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <GroupBox Header="Estado de Resultados" Height="408" Canvas.Left="625" Canvas.Top="0" Width="290" FontWeight="Bold" FontSize="14" BorderThickness="2">
+                <Label Content="(Valores expresados en unidades monetarias)" HorizontalAlignment="Left" Margin="40,0,0,0" VerticalAlignment="Top" FontSize="9" FontWeight="Normal" Foreground="Gray"/>
+            </GroupBox>
+            <Label Name="lblVentas"  Content="(+) Ventas" HorizontalAlignment="Left" Margin="630,40,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtVentas" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="40" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblCostos"  Content="(-) Costos" HorizontalAlignment="Left" Margin="630,60,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtCostos" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="60" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblUtilidadBruta"  Content="Utilidad  bruta" HorizontalAlignment="Left" Margin="630,80,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtUtilidadBruta" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="80" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MyTotalConverter }"
+                                    StringFormat="{}{0:N}"
+                                    FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text"   ElementName="txtVentas" />
+                        <Binding Path="Text"  ElementName="txtCostos"/>
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Label Name="lblGastosAdmin"  Content="(-) Gastos administrativos" HorizontalAlignment="Left" Margin="630,100,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtGastosAdmin" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="100" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblGastosVentas"  Content="(-) Gastos de ventas" HorizontalAlignment="Left" Margin="630,120,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtGastosVentas" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="120" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblCostosOperacion"  Content="     Costos de operación" HorizontalAlignment="Left" Margin="630,140,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtCostosOperacion" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="140" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MySumConverter}"
+                                    StringFormat="{}{0:N}"
+                                    FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text" ElementName="txtGastosAdmin" />
+                        <Binding Path="Text" ElementName="txtGastosVentas" />
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Label Name="lblEbitda"  Content="EBITDA" HorizontalAlignment="Left" Margin="630,160,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtEbitda" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="160" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MyEbitdaConverter }"
+                                     StringFormat="{}{0:N}"
+                                     FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text"   ElementName="txtVentas"/>
+                        <Binding Path="Text"  ElementName="txtCostos"/>
+                        <Binding Path="Text"  ElementName="txtGastosAdmin"/>
+                        <Binding Path="Text"  ElementName="txtGastosVentas"/>
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Label Name="lblDepreciacion"  Content="(-) Depreciación" HorizontalAlignment="Left" Margin="630,180,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtDepreciacion" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="180" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblCostosInversion"  Content="     Costos de inversion" HorizontalAlignment="Left" Margin="630,200,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtCostosInversion" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="200" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" Text="{Binding Path=Text, ElementName=txtDepreciacion}" IsReadOnly="True"/>
+            <Label Name="lblEbit"  Content="EBIT" HorizontalAlignment="Left" Margin="630,220,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtEbit" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="220" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MyEbitConverter }"
+                                     StringFormat="{}{0:N}"
+                                     FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text"   ElementName="txtVentas"/>
+                        <Binding Path="Text"  ElementName="txtCostos"/>
+                        <Binding Path="Text"  ElementName="txtGastosAdmin"/>
+                        <Binding Path="Text"  ElementName="txtGastosVentas"/>
+                        <Binding Path="Text"  ElementName="txtDepreciacion"/>
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Label Name="lblIntereses"  Content="(-) Gastos por intereses" HorizontalAlignment="Left" Margin="630,240,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtIntereses" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="240" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblCostosFinancieros"  Content="     Costos financieros" HorizontalAlignment="Left" Margin="630,260,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtCostosFinancieros" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="260" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" Text="{Binding Path=Text, ElementName=txtIntereses}" IsReadOnly="True"/>
+            <Label Name="lblUtilidadAntesImpuesto"  Content="Utilidad antes de impuesto" HorizontalAlignment="Left" Margin="630,280,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtUtilidadAntesImpuesto" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="280" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MyUtilidadAntesImpuesto }"
+                                     StringFormat="{}{0:N}"
+                                     FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text"   ElementName="txtVentas"/>
+                        <Binding Path="Text"  ElementName="txtCostos"/>
+                        <Binding Path="Text"  ElementName="txtGastosAdmin"/>
+                        <Binding Path="Text"  ElementName="txtGastosVentas"/>
+                        <Binding Path="Text"  ElementName="txtDepreciacion"/>
+                        <Binding Path="Text"  ElementName="txtIntereses"/>
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Label Name="lblImpuestos"  Content="(-) Impuestos" HorizontalAlignment="Left" Margin="630,300,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Normal"/>
+            <TextBox Name="txtImpuestos" Text="0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="300" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Normal" ToolTip="Formato 0.00"/>
+            <Label Name="lblCostosFiscales"  Content="     Costos fiscales" HorizontalAlignment="Left" Margin="630,320,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtCostosFisales" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="320" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" Text="{Binding Path=Text, ElementName=txtImpuestos}" IsReadOnly="True"/>
+            <Label Name="lblUtilidadNeta"  Content="Utilidad neta" HorizontalAlignment="Left" Margin="630,340,0,0" VerticalAlignment="Top" FontSize="11" FontWeight="Bold"/>
+            <TextBox Name="txtUtilidadNeta" HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Height="19" Canvas.Left="780" TextWrapping="Wrap" Canvas.Top="340" Width="120" FontSize="10" FontFamily="Arial" FontWeight="Bold" ToolTip="Formato 0.00" IsReadOnly="True">
+                <TextBox.Text>
+                    <MultiBinding Converter="{StaticResource MyUtilidadNeta }"
+                                     StringFormat="{}{0:N}"
+                                     FallbackValue="Error" TargetNullValue="Null">
+                        <Binding Path="Text"   ElementName="txtVentas"/>
+                        <Binding Path="Text"  ElementName="txtCostos"/>
+                        <Binding Path="Text"  ElementName="txtGastosAdmin"/>
+                        <Binding Path="Text"  ElementName="txtGastosVentas"/>
+                        <Binding Path="Text"  ElementName="txtDepreciacion"/>
+                        <Binding Path="Text"  ElementName="txtIntereses"/>
+                        <Binding Path="Text"  ElementName="txtImpuestos"/>
+                    </MultiBinding>
+                </TextBox.Text>
+            </TextBox>
+            <Button Name="btnBorrar" Content="Borrar" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="28" FontSize="14" FontFamily="Tahona" Canvas.Left="925" Canvas.Top="70" Click="btnBorrar_Click"/>
+            <Button Name="btnActualizar" Content="Actualizar" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="28" FontSize="14" FontFamily="Tahona" Canvas.Left="925" Canvas.Top="110" Click="btnActualizar_Click"/>
+            <Button Name="btnCerrar" Content="Cerrar" HorizontalAlignment="Left" VerticalAlignment="Top" Width="100" Height="28" FontSize="14" FontFamily="Tahona" Canvas.Left="925" Canvas.Top="150" Click="btnCerrar_Click"/>
+            <TextBox Name="txtDummyMes" Background="Yellow" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" Canvas.Left="920" Canvas.Top="190" Visibility="Hidden"/>
+            <TextBlock Canvas.Top="414" Canvas.Left="05" FontSize="13" FontWeight="Bold"  FontFamily="Verdana" >
+                <Run Text="Serie"/>
+                <Run Text="{Binding ElementName=DummyDelete, Path=Text}"/>
+            </TextBlock>
+            <TextBox Name="DummyDelete" Background="Red" Visibility="Hidden" HorizontalAlignment="Left" Height="23" Margin="337,412,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Loaded="DummyDelete_Loaded"/>
+            <DataGrid Name="dgPeriodos" HorizontalAlignment="Left" Height="150" VerticalAlignment="Top" Width="1030" Canvas.Top="435" Canvas.Left="02" SelectionMode="Single" IsReadOnly="True" AutoGeneratingColumn="dgPeriodos_AutoGeneratingColumn" Loaded="dgPeriodos_Loaded" SelectionChanged="dgPeriodos_SelectionChanged" AlternationCount="2" AlternatingRowBackground="#FFD3ECF7" RowBackground="#FFF0FAFA" BorderBrush="#FF96C8FA" HorizontalGridLinesBrush="#FF96C8FA" VerticalGridLinesBrush="#FF96C8FA" AreRowDetailsFrozen="True">
+                <DataGrid.CellStyle>
+                    <Style  TargetType="DataGridCell">
+                        <Setter Property="TextBlock.TextAlignment" Value="Right"/>
+                    </Style>
+                </DataGrid.CellStyle>
+            </DataGrid>            
+        </Canvas>
+    </Grid>
+</Window>
